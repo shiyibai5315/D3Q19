@@ -1,0 +1,38 @@
+# 包含主模块文件
+include("src/D3Q19Model.jl")
+include("src/simulation.jl")
+include("src/initialize.jl")
+include("src/collide.jl")
+include("src/stream.jl")
+include("src/boundary_conditions.jl")
+include("src/utils.jl")
+using .D3Q19Model
+
+using Makie
+using CairoMakie
+CairoMakie.activate!()
+
+# 假定的模拟数据初始化
+nx, ny, nz = 50, 50, 50
+ρ = rand(nx, ny, nz)  # 使用随机数据作为开始的示例
+
+# 创建一系列图片
+for t in 1:100
+    # 模拟数据更新的逻辑
+    # 这里我们假设每一步 ρ 都会有所变化，使用随机数据模拟
+    global ρ = rand(nx, ny, nz)
+    
+    # 创建 Figure 和 Axis3，准备绘制静态图
+    fig = Figure(size = (600, 400))
+    ax = Axis3(fig[1, 1], title = "3D Density Distribution at t=$t", aspect = :data)
+    
+    # 选择一个切片进行绘制
+    slice = ρ[:, :, Int(nz / 2)]  # 示例：选择中间的一个切片
+    surface!(ax, 1:nx, 1:ny, slice, shading = NoShading)
+    
+    # 将当前帧保存为文件
+    filename = "frame_$(lpad(t, 3, '0')).png"
+    save(filename, fig)
+    
+    # 清理以避免过多内存使用
+end
